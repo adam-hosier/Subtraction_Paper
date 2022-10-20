@@ -67,14 +67,29 @@ for i in range(len(xp2)):
 # plt.legend()
 # plt.show()
 # plt.close() 
+r_ebeam = 35
+testint65 = integrate.quad(lambda x: fun1(x, 65, kT, I, a, V), 0, r_ebeam)
+testint66 = integrate.quad(lambda x: fun1(x, 66, kT, I, a, V), 0, r_ebeam)
+testint11 = integrate.quad(lambda x: fun1(x, 11, kT, I, a, V), 0, r_ebeam)
 
+print(testint65, testint66, testint11)
 
+pd65_66 = np.abs(testint65[0]-testint66[0])/testint65[0]
+
+pd65_11 = np.abs(testint65[0]-testint11[0])/testint65[0]
+
+print(100*pd65_66)
+print(100*pd65_11)
 plt.figure() 
-plt.title('boltzmann distributions')
+#plt.title('boltzmann distributions')
 #plt.plot(xp2, funa(xp2, Q, kT, I, a, V), label='potential 1 (r/a)^2')
-plt.plot(xp2, fun1(xp2, Q, kT, I, a, V), label='total potential')
+plt.plot(xp2, fun1(xp2, 65, kT, I, a, V), label='Q = 65')
+plt.plot(xp2, fun1(xp2, 66, kT, I, a, V), label='Q = 66')
+plt.plot(xp2, fun1(xp2, 11, kT, I, a, V), label='Q = 11')
 #plt.plot(xp2a, fun2(xp2a, Q, kT, I, a, V), label='potential 2 (ln)')
 plt.xlim(np.min(0), np.max(xp2))
+plt.ylabel('Intensity (arb)')
+plt.xlabel('Radial distance (micrometers)')
 #plt.ylim(0, 100)
 plt.legend()
 plt.show()
