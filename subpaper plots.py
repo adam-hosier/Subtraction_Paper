@@ -35,7 +35,7 @@ ke = 8.8987551*10**(9)
 mel = 9.11*10**(-31)
 eVJ = 1.60218*10**(-19)
 kb = 1.380649*10**(-23)
-tempest = 1.5e7 #3.35e7
+tempest = 1e7 #3.35e7
 #V = 15              ##Volts
 kT = kb*tempest
 echarge = 1.60217663*10**(-19)
@@ -46,7 +46,7 @@ Ie = 0.150
 Eebeam = 18*1000
 ve = np.sqrt(2*echarge*Eebeam/mel)
 lame = Ie / ve
-lami = 0.7*lame
+lami = 0.5*lame
 lami1 = 0.6*lame 
 lami2 = 0.5*lame 
 V_e = lame / (4*np.pi*ep0)
@@ -154,37 +154,53 @@ edist = mag*np.exp(-(xp2)**2 / (2*esig**2))
 
 beamlen = 1*10**(-2)
 beamarea = np.pi*r_ebeam**2
-print(ve)
-print(lame/(ve*beamarea*echarge*1e10))
-print(volnum)
-qint = integrate.quad(lambda x:volnum*np.exp(-(x)**2 / (2*esig**2)), 0, 500*10**(-6))
-#mag = qint[0]
+
+K = lame*(1e-2) / (esig**2)
+# print(ve)
+# print(lame/(ve*beamarea*echarge*1e10))
+# print(volnum)
+qint = integrate.quad(lambda x:(2/(esig*np.sqrt(2*np.pi)))*np.exp(-(x)**2 / (2*esig**2)), 0, 500e-6)
+mag = qint[0]
+
+qint2 = integrate.quad(lambda x:(K)*x*np.exp(-(x)**2 / (2*esig**2)), 0, 500e-6)
+mag2 = qint2[0]
 #edist = (1/mag)*np.exp(-(xp2)**2 / (2*esig**2))
 edist = (mag)*np.exp(-(xp2)**2 / (2*esig**2))
-#print(qint)
-ilim = 500e-6#r_ebeam*1
+# print(lame*1e-2)
+# print('here ', qint2)
+ilim = 500e-5#r_ebeam*1
+bint1 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bnorm1 = bint1[0]
+eint1 = integrate.quad(lambda x:(1/bnorm1)*(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(K*x*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
 
-eint1 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
-eint2 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bint2 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bnorm2 = bint2[0]
+eint2 = integrate.quad(lambda x:(1/bnorm2)*(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
 
-eint3 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
+bint3 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bnorm3 = bint3[0]
+eint3 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(K*x*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
+
+bint4 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bnorm4 = bint4[0]
 eint4 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
 
-eint9 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
-eint10 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bint9 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bnorm9 = bint9[0]
+eint9 = integrate.quad(lambda x:(1/bnorm9)*(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(K*x*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
+
+bint10 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+bnorm10 = bint10[0]
+eint10 = integrate.quad(lambda x:(1/bnorm10)*(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
+
+evalvolume = np.pi*(ilim**2)*(1e-2)*(1e2)**3
+#print(lame*1e-2/(1e12*1e-2*echarge*np.pi*r_ebeam**2)*(1e-2)**3) 
+#print(ve)
 ##average electron density for light ion
-print(1*10**(-2)*eint1[0]/(echarge*eint2[0]*volnum*1e12))       #w.r.t. Q=65+
-print(1*10**(-2)*eint3[0]/(echarge*eint4[0]))       #w.r.t. Q = 66+
-print('q = 11 only: ', eint9[0]/(echarge*eint10[0]*1e8))
-##average electron density for Q = 65 and 66 
-eint5 = integrate.quad(lambda x:(np.exp(-65*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
-eint6 = integrate.quad(lambda x:(np.exp(-65*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
-
-eint7 = integrate.quad(lambda x:(np.exp(-66*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
-eint8 = integrate.quad(lambda x:(np.exp(-66*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
-
-# print(1*10**(-2)*eint5[0]/(echarge*eint6[0]))       #Q=65+
-# print(1*10**(-2)*eint7[0]/(echarge*eint8[0]))       #Q=66+
+print('electron beam: ', lame*1e-2/(1e12*1e-2*echarge*np.pi*r_ebeam**2)*(1e-2)**3)
+print('q = 11+ & 65+ ',eint1[0]/(echarge*eint2[0]*evalvolume*1e12))       #w.r.t. Q=65+
+print('q = 11+ & 66+ ', eint3[0]/(echarge*eint4[0]*evalvolume*1e12))       #w.r.t. Q = 66+
+print('q = 11+ only: ', eint9[0]/(echarge*eint10[0]*evalvolume*1e12))
 
 
 
@@ -225,8 +241,9 @@ plt.plot(xp2*1e6, newboltz11_66/np.max(newboltz11_66), label='Q = 11+ & heavy io
 #plt.plot(xp2*1e6, boltzli/np.max(boltzli), label='Q = 11+ (ion only potential)')
 #plt.plot(xp2*1e6, newboltz11_only/np.max(newboltz11_only), label='Q = 11+ (ebeam potential only)')
 plt.plot(xp2*1e6, boltzlisum/np.max(boltzlisum), label='Q = 11+')
-#plt.xlim(np.min(0), np.max(1e6*xp2))
-plt.xlim(np.min(0), 500)
+plt.xlim(np.min(0), 5000)
+#plt.xlim(np.min(0), 10000)
+#plt.xscale('log')
 plt.ylim(0, 1.05)
 plt.ylabel('Relative radial distribution (arb)')
 plt.xlabel('Radial distance (micrometers)')
