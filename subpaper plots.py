@@ -35,7 +35,7 @@ ke = 8.8987551*10**(9)
 mel = 9.11*10**(-31)
 eVJ = 1.60218*10**(-19)
 kb = 1.380649*10**(-23)
-tempest = 2e7 #3.35e7
+tempest = 1.5e7 #3.35e7
 #V = 15              ##Volts
 kT = kb*tempest
 echarge = 1.60217663*10**(-19)
@@ -147,11 +147,22 @@ newboltz11_66 = np.exp(-11*echarge*(sumpot66)/(kT))
 boltzli = np.exp(-11*echarge*(ionpotlight)/(kT))
 boltzlisum = np.exp(-11*echarge*(sumpotlight)/(kT))
 
+volnum = r_ebeam*2*np.pi*1*10**(-2)
 mag = lame
 esig = r_ebeam/(np.sqrt(2*np.log(2)))
 edist = mag*np.exp(-(xp2)**2 / (2*esig**2))
 
-ilim = r_ebeam*1
+beamlen = 1*10**(-2)
+beamarea = np.pi*r_ebeam**2
+print(ve)
+print(lame/(ve*beamarea*echarge*1e10))
+print(volnum)
+qint = integrate.quad(lambda x:volnum*np.exp(-(x)**2 / (2*esig**2)), 0, 500*10**(-6))
+#mag = qint[0]
+#edist = (1/mag)*np.exp(-(xp2)**2 / (2*esig**2))
+edist = (mag)*np.exp(-(xp2)**2 / (2*esig**2))
+#print(qint)
+ilim = 500e-6#r_ebeam*1
 
 eint1 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
 eint2 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
@@ -159,10 +170,12 @@ eint2 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw, V_i)-
 eint3 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
 eint4 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
 
+eint9 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
+eint10 = integrate.quad(lambda x:(np.exp(-11*echarge*((-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
 ##average electron density for light ion
-print(1*10**(-2)*eint1[0]/(echarge*eint2[0]))       #w.r.t. Q=65+
+print(1*10**(-2)*eint1[0]/(echarge*eint2[0]*volnum*1e12))       #w.r.t. Q=65+
 print(1*10**(-2)*eint3[0]/(echarge*eint4[0]))       #w.r.t. Q = 66+
-
+print('q = 11 only: ', eint9[0]/(echarge*eint10[0]*1e8))
 ##average electron density for Q = 65 and 66 
 eint5 = integrate.quad(lambda x:(np.exp(-65*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
 eint6 = integrate.quad(lambda x:(np.exp(-65*echarge*((-(potT(x, ioncloudw, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
@@ -170,8 +183,10 @@ eint6 = integrate.quad(lambda x:(np.exp(-65*echarge*((-(potT(x, ioncloudw, V_i)-
 eint7 = integrate.quad(lambda x:(np.exp(-66*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT)))*(mag*np.exp(-(x)**2 / (2*esig**2))),0,ilim)
 eint8 = integrate.quad(lambda x:(np.exp(-66*echarge*((-(potT(x, ioncloudw66, V_i)-shiftVi))+(-(potT(x, a, -V_e)+shiftVe)))/(kT))),0,ilim)
 
-print(1*10**(-2)*eint5[0]/(echarge*eint6[0]))       #Q=65+
-print(1*10**(-2)*eint7[0]/(echarge*eint8[0]))       #Q=66+
+# print(1*10**(-2)*eint5[0]/(echarge*eint6[0]))       #Q=65+
+# print(1*10**(-2)*eint7[0]/(echarge*eint8[0]))       #Q=66+
+
+
 
 plt.figure() 
 #plt.title('potential')
@@ -202,20 +217,20 @@ plt.close()
 #print(1e6*xp2)
 plt.figure() 
 plt.axvline(x=r_ebeam*1e6, ls='--',c='k', label='Radius of Electron Beam')
-plt.plot(xp2*1e6, edist, label='e-beam distribution')
+plt.plot(xp2*1e6, edist/mag, label='e-beam distribution')
 plt.plot(xp2*1e6, newboltz65_/np.max(newboltz65_), label='Q = 65+')
 plt.plot(xp2*1e6, newboltz66_/np.max(newboltz66_), label='Q = 66+')
 plt.plot(xp2*1e6, newboltz11_/np.max(newboltz11_), label='Q = 11+ & heavy ions (65+)')
 plt.plot(xp2*1e6, newboltz11_66/np.max(newboltz11_66), label='Q = 11+ & heavy ions (66+)')
 #plt.plot(xp2*1e6, boltzli/np.max(boltzli), label='Q = 11+ (ion only potential)')
-plt.plot(xp2*1e6, newboltz11_only/np.max(newboltz11_only), label='Q = 11+ (ebeam potential only)')
-plt.plot(xp2*1e6, boltzlisum/np.max(boltzlisum), label='Q = 11+ (ion + ebeam potential)')
+#plt.plot(xp2*1e6, newboltz11_only/np.max(newboltz11_only), label='Q = 11+ (ebeam potential only)')
+plt.plot(xp2*1e6, boltzlisum/np.max(boltzlisum), label='Q = 11+')
 #plt.xlim(np.min(0), np.max(1e6*xp2))
 plt.xlim(np.min(0), 500)
 plt.ylim(0, 1.05)
 plt.ylabel('Relative radial distribution (arb)')
 plt.xlabel('Radial distance (micrometers)')
 #plt.ylim(0,1.5)
-#plt.legend()
+plt.legend()
 plt.show()
 plt.close() 
