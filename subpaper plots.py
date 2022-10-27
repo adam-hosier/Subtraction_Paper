@@ -27,7 +27,7 @@ def fun2(x, Q, KT, I, a, V):
 
 r_ebeam = 35*10**(-6)
 Q = 76
-Qlight = 60
+Qlight = 10
 I = 1                ## normalized intensity 
 a = r_ebeam       
 delta = 1     ##micrometers
@@ -43,8 +43,8 @@ echarge = 1.60217663*10**(-19)
 xp = np.linspace(-400, 400, num=10000)*10**(-6)
 xp2 = np.linspace(0, 5000, num=10000)*10**(-6)
 
-Ie = 0.150
-Eebeam = 18*1000
+Ie = 0.150                  #current of ebeam A
+Eebeam = 18*1000            #energy of ebeam eV
 ve = np.sqrt(2*echarge*Eebeam/mel)
 lame = Ie / ve
 lami = 0.5*lame
@@ -56,19 +56,6 @@ V_i1 = lami1 / (4*np.pi*ep0)
 V_i2 = lami2 / (4*np.pi*ep0)
 V = V_e
 
-
-# testf = fun1(xp2, Q, kT, I, a, V)
-
-# iepot = []
-# ipot2 = []
-
-
-# testint65 = integrate.quad(lambda x: fun1(x, 65*echarge, kT, I, a, V), 0, r_ebeam)
-# testint66 = integrate.quad(lambda x: fun1(x, 66*echarge, kT, I, a, V), 0, r_ebeam)
-# testint11 = integrate.quad(lambda x: fun1(x, 11*echarge, kT, I, a, V), 0, r_ebeam)
-
-# pd65_66 = np.abs(testint65[0]-testint66[0])/testint65[0]
-# pd65_11 = np.abs(testint65[0]-testint11[0])/testint65[0]
 
 idist = fun1(xp2, 65*echarge, kT, I, a, V)
 idist66 = fun1(xp2, 66*echarge, kT, I, a, V)
@@ -82,36 +69,7 @@ indlight = np.where(idistlight<=maxvallight)[0][0]
 ioncloudw = xp2[ind1]
 ioncloudw66 = xp2[ind66]
 ioncloudwlight = xp2[indlight]
-#print(ioncloudw*10**(6))
-#ioncloudw = 35*10**(-6)
 
-# Nion = 1*10**(3)
-# Vion = Nion*ke*65*echarge/(ioncloudw)
-# Vion66 = Nion*ke*66*echarge/(ioncloudw66)
-
-# Q65_ebeam_pot = potT(xp2, ioncloudw, Vion) + potT(xp2, a, -V)
-# Q66_ebeam_pot = potT(xp2, ioncloudw66, Vion66) + potT(xp2, a, -V)
-# newpot65_11 = np.exp(-11*echarge*Q65_ebeam_pot/kT)
-# newpot66_11 = np.exp(-11*echarge*Q66_ebeam_pot/kT)
-
-
-# int65 = integrate.quad(lambda x: fun1(x, 65*echarge, kT, I, a, -V), 0, r_ebeam)
-# int11 = integrate.quad(lambda x: np.exp(-11*echarge*(potT(x, ioncloudw, Vion) + potT(x, a, -V))/kT), 0, r_ebeam)
-# pd65_11 = 100*np.abs(int65[0]-int11[0])/int65[0]
-
-# int66 = integrate.quad(lambda x: fun1(x, 66*echarge, kT, I, a, -V), 0, r_ebeam)
-# int11_66 = integrate.quad(lambda x: np.exp(-11*echarge*(potT(x, ioncloudw66, Vion66) + potT(x, a, -V))/kT), 0, r_ebeam)
-# pd66_11 = 100*np.abs(int66[0]-int11[0])/int66[0]
-# pd66_65 = 100*np.abs(int66[0]-int65[0])/int66[0]
-
-
-
-
-# newboltz = np.exp(-11*echarge*(potT(xp2, ioncloudw, Vion) - potT(xp2, a, V))/(kT))
-# newboltz66 = np.exp(-11*echarge*(potT(xp2, ioncloudw66, Vion) - potT(xp2, a, V))/(kT))
-
-# eint1 = integrate.quad(lambda x:(np.exp(-11*echarge*(potT(x, ioncloudw, Vion) + potT(x, a, -V))/(kT)))*(np.exp(-11*echarge*(potT(x, ioncloudw66, Vion66) + potT(x, a, -V))/(kT))),0,r_ebeam)
-# eint2 = integrate.quad(lambda x:(np.exp(-11*echarge*(potT(x, ioncloudw, Vion) + potT(x, a, -V))/(kT)))*(fun1(x, 66*echarge, kT, I, a, -V)),0,r_ebeam)
 
 #################################
 
@@ -210,21 +168,21 @@ plt.figure()
 plt.axvline(x=r_ebeam*1e6, c='k', ls='--', label='Radius of electron beam')
 plt.axvline(x=ioncloudw*1e6, c='tab:grey',ls='--', label='Radius of ion cloud')
 plt.plot(xp2*1e6, -(potT(xp2, a, -V_e)+shiftVe), label='Electron beam')
-plt.plot(xp2*1e6, ionpot, c='r', label='heavy ion cloud (70\%)')
+plt.plot(xp2*1e6, ionpot, c='r', label='heavy ion cloud (70%)')
 #plt.plot(xp2*1e6, -(potT(xp2, ioncloudwlight, V_i)-shiftVilight), label='light ion cloud')
-plt.plot(xp2*1e6, sumpot,c='g', label='heavy sum (70\%)')
+plt.plot(xp2*1e6, sumpot,c='g', label='heavy sum (70%)')
 #plt.plot(xp2*1e6, (-(potT(xp2, ioncloudwlight, V_i)-shiftVilight))+(-(potT(xp2, a, -V_e)+shiftVe)), label='light sum')
 
 #plt.plot(xp2*1e6, -(potT(xp2, a, -V_e)+shiftVe), label='ebeam')
-plt.plot(xp2*1e6, ionpot60p,c='r',ls='-.', label='heavy ion cloud (60\%)')
-plt.plot(xp2*1e6, sumpot60p,c='g',ls='-.', label='heavy sum (60\%)')
+plt.plot(xp2*1e6, ionpot60p,c='r',ls='-.', label='heavy ion cloud (60%)')
+plt.plot(xp2*1e6, sumpot60p,c='g',ls='-.', label='heavy sum (60%)')
 
-plt.plot(xp2*1e6, ionpot50p,c='r',ls='--', label='heavy ion cloud (50\%)')
-plt.plot(xp2*1e6, sumpot50p,c='g',ls='--', label='heavy sum (50\%)')
+plt.plot(xp2*1e6, ionpot50p,c='r',ls='--', label='heavy ion cloud (50%)')
+plt.plot(xp2*1e6, sumpot50p,c='g',ls='--', label='heavy sum (50%)')
 
 
 #plt.plot(xp2, Q65_ebeam_pot, label='total potential')
-plt.xlim(np.min(0), 500)
+plt.xlim(np.min(0), 5000)
 plt.ylabel('Potential (V)')
 plt.xlabel('Radial distance (micrometers)')
 plt.legend()
@@ -242,7 +200,7 @@ plt.plot(xp2*1e6, newboltz11_66/np.max(newboltz11_66), label='Q = '+str(Qlight)+
 #plt.plot(xp2*1e6, boltzli/np.max(boltzli), label='Q = 11+ (ion only potential)')
 #plt.plot(xp2*1e6, newboltz11_only/np.max(newboltz11_only), label='Q = 11+ (ebeam potential only)')
 plt.plot(xp2*1e6, boltzlisum/np.max(boltzlisum), label='Q = '+str(Qlight)+'+')
-plt.xlim(np.min(0), 5000)
+plt.xlim(np.min(0), 500)
 #plt.xlim(np.min(0), 10000)
 #plt.xscale('log')
 plt.ylim(0, 1.05)
